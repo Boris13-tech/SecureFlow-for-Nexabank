@@ -1,38 +1,38 @@
 name: Test OIDC
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-    azure-login:
-        runs-on: ubuntu-latest
+  azure-login:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Login Azure (OIDC)
-                uses: azure/login@v2
-                with:
-                    client-id: ${{ secrets.AZURE_CLIENT_ID }}
-                    tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-                    subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    steps:
+      - name: Login Azure (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Verify Azure Login
+        run: az account show --output table
 
-              - name: Verify Azure Login
-               run: az account show --output table
+  aws-login:
+    runs-on: ubuntu-latest
 
-    aws-login:
-        runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-        steps:
-            - name: Configure AWS Credentials (OIDC)
-                uses: aws-actions/configure-aws-credentials@v4
-                with:
-                    role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-                    aws-region: ${{ secrets.AWS_REGION }}
-
-            - name: Verify AWS Login
-               run: aws sts get-caller-identity 
+      - name: Verify AWS Login
+        run: aws sts get-caller-identity 
          
      
